@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "158277785218",
+    "project_id": "digital-counter-69f17",
+    "storage_bucket": "digital-counter-69f17.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:158277785218:android:4d1e12e8e7764dcd40469b",
+        "android_client_info": {
+          "package_name": "com.counter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYSaceq2LsfvQP8Kq589M28D26UqPzhkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

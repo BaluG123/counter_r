@@ -219,17 +219,29 @@
 
 // export default DetailScreen;
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, StatusBar } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, StatusBar, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 
 const DetailScreen = ({ route }) => {
+  const bannerRef = useRef<BannerAd>(null);
   const { counter, onGoBack } = route.params;
   const [count, setCount] = useState(parseInt(counter.count, 10));
   const navigation = useNavigation();
+
+  useForeground(() => {
+    if (Platform.OS === 'android') {
+      bannerRef.current?.load();
+    }
+  });
+
+
+
+  const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-2627956667785383/9111272173';
 
   const handleIncrement = () => {
     setCount(prevCount => prevCount + 1);
@@ -280,6 +292,13 @@ const DetailScreen = ({ route }) => {
         <Icon name="save-outline" size={24} color="#fff" />
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
+      <View style={styles.bannerAd}>
+      <BannerAd
+      ref={bannerRef}
+      unitId={adUnitId}
+      size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+    />
+      </View>
     </View>
   );
 };
@@ -354,6 +373,11 @@ const styles = StyleSheet.create({
     fontSize: wp('4.5%'),
     fontWeight: 'bold',
     marginLeft: wp('2%'),
+  },
+  bannerAd: {
+    position: 'absolute',
+    bottom: 0,
+    width: wp('100%')
   },
 });
 

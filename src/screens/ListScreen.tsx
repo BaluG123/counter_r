@@ -5,8 +5,11 @@ import DatePicker from 'react-native-date-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
+
 
 const ListScreen = () => {
+  const bannerRef = useRef<BannerAd>(null);
   const [counters, setCounters] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -18,6 +21,17 @@ const ListScreen = () => {
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
   const animation = useRef(new Animated.Value(0)).current;
+
+  useForeground(() => {
+    if (Platform.OS === 'android') {
+      bannerRef.current?.load();
+    }
+  });
+
+
+
+  const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-2627956667785383/2591700513';
+
 
   const borderColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33F1', '#33FFF1', '#F1FF33'];
 
@@ -181,6 +195,14 @@ const ListScreen = () => {
     ],
   };
 
+  const renderEmptyList = () => {
+    return (
+      <View style={styles.emptyListMessage}>
+        <Text style={styles.emptyListText}>No counter added yet. Click the plus button to add a new counter.</Text>
+      </View>
+    );
+  };
+
   const renderCounter = ({ item, index }) => (
     <View style={[styles.counterItem, { borderLeftColor: borderColors[index % borderColors.length], borderLeftWidth: 1.5,borderBottomColor:'gray',borderBottomWidth:1,borderTopColor:'gray',borderTopWidth:1.5,borderRightColor:'gray',borderRightWidth:1.5 }]}>
       <TouchableOpacity
@@ -212,10 +234,19 @@ const ListScreen = () => {
       </TouchableOpacity> */}
 
       {/* List of Counters */}
+      <View style={styles.bannerAd}>
+      <BannerAd
+      ref={bannerRef}
+      unitId={adUnitId}
+      size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+    />
+      </View>
       <FlatList
         data={counters}
         keyExtractor={(item) => item.id}
         renderItem={renderCounter}
+        ListEmptyComponent={renderEmptyList} // Render the empty list message
+
       />
             <TouchableOpacity
         style={styles.fab}
@@ -310,15 +341,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: wp('5%'),
   },
-  // counterItem: {
-  //   backgroundColor: '#fff',
-  //   padding: wp('4%'),
-  //   marginBottom: hp('1%'),
-  //   borderRadius: 5,
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center',
-  // },
   counterItem: {
     backgroundColor: '#fff',
     padding: wp('4%'),
@@ -419,6 +441,23 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  emptyListMessage: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical:hp('30%')
+  },
+  
+  emptyListText: {
+    fontSize: wp('5%'),
+    color: 'gray',
+    textAlign: 'center',
+    justifyContent:'center'
+  },
+  bannerAd: {
+    alignItems: 'center',
+    marginBottom: 10,
   },
 });
 

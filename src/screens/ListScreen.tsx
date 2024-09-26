@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput, Button, Alert, Modal, StyleSheet, Platform, BackHandler } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, FlatList, TouchableOpacity, TextInput, Button, Alert, Modal, StyleSheet, Platform, BackHandler,Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DatePicker from 'react-native-date-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,6 +16,10 @@ const ListScreen = () => {
   const [date, setDate] = useState(new Date());
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const navigation = useNavigation();
+  const [isOpen, setIsOpen] = useState(false);
+  const animation = useRef(new Animated.Value(0)).current;
+
+  const borderColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33F1', '#33FFF1', '#F1FF33'];
 
   useEffect(() => {
     loadCounters();
@@ -151,21 +155,47 @@ const ListScreen = () => {
     setModalVisible(true);
   };
 
-  const renderCounter = ({ item }) => (
-    <View style={styles.counterItem}>
+  const toggleMenu = () => {
+    const toValue = isOpen ? 0 : 1;
+
+    Animated.spring(animation, {
+      toValue,
+      friction: 5,
+      useNativeDriver: true,
+    }).start();
+
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      openAddModal();
+    }
+  };
+
+  const rotation = {
+    transform: [
+      {
+        rotate: animation.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['0deg', '45deg'],
+        }),
+      },
+    ],
+  };
+
+  const renderCounter = ({ item, index }) => (
+    <View style={[styles.counterItem, { borderLeftColor: borderColors[index % borderColors.length], borderLeftWidth: 1.5,borderBottomColor:'gray',borderBottomWidth:1,borderTopColor:'gray',borderTopWidth:1.5,borderRightColor:'gray',borderRightWidth:1.5 }]}>
       <TouchableOpacity
         style={styles.counterText}
         onPress={() => navigation.navigate('Detail', { counter: item })}
       >
         <Text style={styles.counterTitle}>{item.title}</Text>
-        <Text style={{color:'black'}}>{item.count}</Text>
-        <Text style={{color:'black'}}>{item.date}</Text>
+        <Text style={{color:'black'}}><Icon name="podium" size={20} color="#1da1f2" /> {item.count}</Text>
+        <Text style={{color:'black'}}><Icon name="calendar" size={20} color="#1da1f2" /> {item.date}</Text>
       </TouchableOpacity>
 
       {/* Edit and Delete Buttons */}
       <View style={styles.actionButtons}>
         <TouchableOpacity onPress={() => openEditModal(item)}>
-          <Icon name="pencil" size={24} color="green" />
+          <Icon name="create" size={24} color="green" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => deleteCounter(item.id)}>
           <Icon name="trash" size={24} color="red" />
@@ -177,9 +207,9 @@ const ListScreen = () => {
   return (
     <View style={styles.container}>
       {/* Add Counter Button */}
-      <TouchableOpacity style={styles.addButton} onPress={openAddModal}>
+      {/* <TouchableOpacity style={styles.addButton} onPress={openAddModal}>
         <Text style={styles.addButtonText}>Add Counter</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* List of Counters */}
       <FlatList
@@ -187,6 +217,14 @@ const ListScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderCounter}
       />
+            <TouchableOpacity
+        style={styles.fab}
+        onPress={toggleMenu}
+      >
+        <Animated.View style={rotation}>
+          <Icon name="add" size={24} color="#FFF" />
+        </Animated.View>
+      </TouchableOpacity>
 <Modal
   visible={modalVisible}
   animationType="slide"
@@ -272,6 +310,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: wp('5%'),
   },
+  // counterItem: {
+  //   backgroundColor: '#fff',
+  //   padding: wp('4%'),
+  //   marginBottom: hp('1%'),
+  //   borderRadius: 5,
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center',
+  // },
   counterItem: {
     backgroundColor: '#fff',
     padding: wp('4%'),
@@ -280,6 +327,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderLeftWidth: 5, // This will be overridden in the renderCounter function
   },
   counterText: {
     flex: 1,
@@ -355,6 +403,22 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff', // Text color
     fontSize: wp('4%'), // Adjust font size based on screen width
+  },
+  fab: {
+    position: 'absolute',
+    width: wp('15%'),
+    height: wp('15%'), // Make height equal to width for a circular shape
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: wp('8%'),
+    bottom: hp('10%'),
+    backgroundColor: '#1da1f2',
+    borderRadius: wp('7.5%'), // Half of the width for a circular shape
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 

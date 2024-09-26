@@ -1,20 +1,20 @@
 // src/navigation/AppNavigator.tsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import ListScreen from '../screens/ListScreen';
 import DetailScreen from '../screens/DetailScreen';
+import Splashscreen from '../screens/Splashscreen';
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
+  const [initialRoute, setInitialRoute] = useState('SplashScreen');
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName={initialRoute}>
         <Stack.Screen name="List" component={ListScreen}
-        name="List"
-        component={ListScreen}
         options={{
           headerTitle: 'Pray List', // Set title for List screen
           headerTitleAlign: 'center', // Center the title
@@ -27,10 +27,8 @@ const AppNavigator = () => {
           },
         }} />
         <Stack.Screen name="Detail" component={DetailScreen} 
-        name="Detail"
-        component={DetailScreen}
         options={{
-            headerLeft: null,
+          headerLeft: null,
           headerTitle: 'Pray Details', // Set a different title for Detail screen
           headerTitleAlign: 'center', // Center the title
           headerStyle: {
@@ -41,6 +39,8 @@ const AppNavigator = () => {
             color: '#333', // Color of the title
           },
         }}/>
+        <Stack.Screen name="SplashScreen" component={Splashscreen}
+        options={{headerShown:false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

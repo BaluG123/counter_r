@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:158277785218:android:4d1e12e8e7764dcd40469b",
+        "mobilesdk_app_id": "1:158277785218:android:9e0c24a4af4464e540469b",
         "android_client_info": {
-          "package_name": "com.counter"
+          "package_name": "com.digitalcounter"
         }
       },
       "oauth_client": [],

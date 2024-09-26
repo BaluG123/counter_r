@@ -1,4 +1,4 @@
-package com.counter
+package com.digitalcounter
 
 import android.app.Application
 import com.facebook.react.PackageList

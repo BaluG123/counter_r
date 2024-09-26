@@ -1,6 +1,6 @@
 {
-  "name": "counter",
-  "displayName": "counter",
+  "name": "digitalcounter",
+  "displayName": "Digi Counter",
   "react-native-google-mobile-ads": {
     "android_app_id": "ca-app-pub-2627956667785383~3426270038"
   }

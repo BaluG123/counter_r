@@ -227,7 +227,7 @@ const DetailScreen = ({route}) => {
         item.id === counter.id ? {...item, count: count.toString()} : item,
       );
       await saveCounters(updatedCounters);
-      Alert.alert('Success', 'Counter updated successfully!');
+      Alert.alert('Success', 'Counter saved successfully!');
       if (onGoBack) {
         onGoBack();
       }

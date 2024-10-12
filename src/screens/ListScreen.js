@@ -481,6 +481,7 @@ import Animated, {
   useSharedValue,
   withTiming,
   withSpring,
+  Layout,
 } from 'react-native-reanimated';
 import {Swipeable} from 'react-native-gesture-handler';
 import DatePicker from 'react-native-date-picker';
@@ -491,6 +492,8 @@ import {
   TestIds,
   useForeground,
 } from 'react-native-google-mobile-ads';
+import LinearGradient from 'react-native-linear-gradient';
+import {SwipeListView} from 'react-native-swipe-list-view';
 
 const adUnitId = __DEV__
   ? TestIds.ADAPTIVE_BANNER
@@ -523,12 +526,26 @@ const ListScreen = () => {
   );
 
   const borderColors = [
-    '#FF5733',
-    '#33FF57',
-    '#3357FF',
-    '#FF33F1',
-    '#33FFF1',
-    '#F1FF33',
+    '#FF6B6B', // Soft Red
+    '#FFD93D', // Warm Yellow
+    '#6BCB77', // Fresh Green
+    '#4D96FF', // Calm Blue
+    '#FFB5E8', // Light Pink
+    '#845EC2', // Deep Purple
+    '#FFC75F', // Sunrise Orange
+    '#2D98DA', // Ocean Blue
+    '#F9A8D4', // Rosy Pink
+    '#F98404', // Tangerine
+    '#5D9CEC', // Sky Blue
+    '#2ECC71', // Emerald Green
+    '#F39C12', // Bright Amber
+    '#9B59B6', // Amethyst
+    '#1ABC9C', // Turquoise
+    '#D4AC0D', // Goldenrod
+    '#FF5733', // Vivid Orange
+    '#3498DB', // Bold Blue
+    '#D35400', // Pumpkin Orange
+    '#A569BD', // Lavender Purple
   ];
 
   const loadCountersFromStorage = async () => {
@@ -635,42 +652,49 @@ const ListScreen = () => {
   });
 
   const renderCounter = ({item, index}) => (
-    <Animated.View entering={FadeIn.delay(index * 100)} exiting={FadeOut}>
-      <Swipeable
-        renderRightActions={() => (
-          <TouchableOpacity
-            style={styles.deleteAction}
-            onPress={() => deleteCounter(item.id)}>
-            <Icon name="trash" size={24} color="white" />
-          </TouchableOpacity>
-        )}>
-        <View
-          style={[
-            styles.counterItem,
-            {borderLeftColor: borderColors[index % borderColors.length]},
-          ]}>
-          <TouchableOpacity
-            style={styles.counterText}
-            onPress={() =>
-              navigation.navigate('Detail', {
-                counter: item,
-                onGoBack: loadCountersFromStorage,
-              })
-            }>
-            <Text style={styles.counterTitle}>{item.title}</Text>
-            <Text style={styles.counterCount}>
-              <Icon name="podium" size={20} color="#1da1f2" /> {item.count}
-            </Text>
-            <Text style={styles.counterDate}>
-              <Icon name="calendar" size={20} color="#1da1f2" /> {item.date}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => openEditModal(item)}>
-            <Icon name="create" size={24} color="green" />
-          </TouchableOpacity>
-        </View>
-      </Swipeable>
+    <Animated.View
+      entering={FadeIn.delay(index * 100).springify()}
+      exiting={FadeOut}
+      layout={Layout.springify()}>
+      <LinearGradient
+        colors={['#ffffff', '#f0f0f0']}
+        style={[
+          styles.counterItem,
+          {borderLeftColor: borderColors[index % borderColors.length]},
+        ]}>
+        <TouchableOpacity
+          style={styles.counterText}
+          onPress={() =>
+            navigation.navigate('Detail', {
+              counter: item,
+              onGoBack: loadCountersFromStorage,
+            })
+          }>
+          <Text style={styles.counterTitle}>{item.title}</Text>
+          <View style={styles.counterInfo}>
+            <Icon name="trophy-outline" size={20} color="#1da1f2" />
+            <Text style={styles.counterCount}>{item.count}</Text>
+          </View>
+          <View style={styles.counterInfo}>
+            <Icon name="calendar-outline" size={20} color="#1da1f2" />
+            <Text style={styles.counterDate}>{item.date}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => openEditModal(item)}>
+          <Icon name="create-outline" size={24} color="#4CAF50" />
+        </TouchableOpacity>
+      </LinearGradient>
     </Animated.View>
+  );
+
+  const renderHiddenItem = (data, rowMap) => (
+    <View style={styles.rowBack}>
+      <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnRight]}
+        onPress={() => deleteCounter(data.item.id)}>
+        <Icon name="trash-outline" size={24} color="white" />
+      </TouchableOpacity>
+    </View>
   );
 
   const renderEmptyList = () => (
@@ -683,11 +707,18 @@ const ListScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
+      <SwipeListView
         data={counters}
-        keyExtractor={item => item.id}
         renderItem={renderCounter}
+        renderHiddenItem={renderHiddenItem}
+        rightOpenValue={-75}
+        previewRowKey={'0'}
+        previewOpenValue={-40}
+        previewOpenDelay={3000}
+        friction={1000}
+        tension={40}
         ListEmptyComponent={renderEmptyList}
+        keyExtractor={item => item.id}
       />
       <Animated.View style={[styles.fab, addButtonStyle]}>
         <TouchableOpacity

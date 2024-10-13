@@ -1358,11 +1358,11 @@ const ListScreen = () => {
           </View>
         </View>
       </Modal>
-      {/* <BannerAd
+      <BannerAd
         ref={bannerRef}
         unitId={adUnitId}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-      /> */}
+      />
       <CustomAlert
         visible={ErroralertVisible}
         title="Error"
